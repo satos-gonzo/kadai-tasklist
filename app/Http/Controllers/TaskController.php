@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 
-use App\Task;    // 追加
+use App\Task;    // 追加する
 
 class TaskController extends Controller
 {
@@ -45,7 +45,14 @@ class TaskController extends Controller
      */
     public function store(Request $request)
     {
+        
+        $this->validate($request, [
+            'status' => 'required|max:10',   // 追加
+            'content' => 'required|max:10',
+        ]);
+        
         $task = new Task;
+        $task->status = $request->status;    // 追加
         $task->content = $request->content;
         $task->save();
 
@@ -93,7 +100,13 @@ class TaskController extends Controller
      */
     public function update(Request $request, $id)
     {
+        $this->validate($request, [
+        'status' => 'required|max:10',   // 追加
+        'content' => 'required|max:10',
+        ]);
+        
         $task = Task::find($id);
+        $task->status = $request->status;    // 追加
         $task->content = $request->content;
         $task->save();
 
