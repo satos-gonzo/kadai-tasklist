@@ -15,11 +15,18 @@ class TaskController extends Controller
      */
     public function index()
     {
-        $tasks = Task::all();
-
-        return view('tasks.index', [
-            'tasks' => $tasks,
-        ]);
+        $data = [];
+        if (\Auth::check()) {
+            $user = \Auth::user();
+            $tasks = $user->tasks()->orderBy('created_at', 'desc')->paginate(10);
+            
+            $data = [
+                'user' => $user,
+                'tasks' => $tasks,
+            ];
+        }
+        
+        return view('welcome', $data);
     }
 
     /**
@@ -47,13 +54,14 @@ class TaskController extends Controller
     {
         
         $this->validate($request, [
-            'status' => 'required|max:10',   // 追加
-            'content' => 'required|max:10',
+            'status' => 'required|max:191',   // 追加
+            'content' => 'required|max:191',
         ]);
         
         $task = new Task;
         $task->status = $request->status;    // 追加
         $task->content = $request->content;
+        $task->user_id = \Auth::id();       //ログインしているユーザーのID表示
         $task->save();
 
         return redirect('/');
@@ -101,8 +109,8 @@ class TaskController extends Controller
     public function update(Request $request, $id)
     {
         $this->validate($request, [
-        'status' => 'required|max:10',   // 追加
-        'content' => 'required|max:10',
+        'status' => 'required|max:191',   // 追加
+        'content' => 'required|max:191',
         ]);
         
         $task = Task::find($id);
